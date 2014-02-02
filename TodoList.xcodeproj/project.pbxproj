@@ -19,6 +19,8 @@
 		CE453629189975520025ECA6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE453611189975510025ECA6 /* UIKit.framework */; };
 		CE453631189975520025ECA6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE45362F189975520025ECA6 /* InfoPlist.strings */; };
 		CE453633189975520025ECA6 /* TodoListTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CE453632189975520025ECA6 /* TodoListTests.m */; };
+		CE45363E189975F60025ECA6 /* CAGTodoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE45363D189975F60025ECA6 /* CAGTodoListViewController.m */; };
+		CE453641189B1FE70025ECA6 /* CAGCreateTodoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE453640189B1FE70025ECA6 /* CAGCreateTodoViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +50,10 @@
 		CE45362E189975520025ECA6 /* TodoListTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TodoListTests-Info.plist"; sourceTree = "<group>"; };
 		CE453630189975520025ECA6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CE453632189975520025ECA6 /* TodoListTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TodoListTests.m; sourceTree = "<group>"; };
+		CE45363C189975F60025ECA6 /* CAGTodoListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAGTodoListViewController.h; sourceTree = "<group>"; };
+		CE45363D189975F60025ECA6 /* CAGTodoListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CAGTodoListViewController.m; sourceTree = "<group>"; };
+		CE45363F189B1FE70025ECA6 /* CAGCreateTodoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAGCreateTodoViewController.h; sourceTree = "<group>"; };
+		CE453640189B1FE70025ECA6 /* CAGCreateTodoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CAGCreateTodoViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +117,10 @@
 				CE45361D189975510025ECA6 /* CAGAppDelegate.m */,
 				CE45361F189975510025ECA6 /* Images.xcassets */,
 				CE453614189975510025ECA6 /* Supporting Files */,
+				CE45363C189975F60025ECA6 /* CAGTodoListViewController.h */,
+				CE45363D189975F60025ECA6 /* CAGTodoListViewController.m */,
+				CE45363F189B1FE70025ECA6 /* CAGCreateTodoViewController.h */,
+				CE453640189B1FE70025ECA6 /* CAGCreateTodoViewController.m */,
 			);
 			path = TodoList;
 			sourceTree = "<group>";
@@ -240,7 +250,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE453641189B1FE70025ECA6 /* CAGCreateTodoViewController.m in Sources */,
 				CE45361E189975510025ECA6 /* CAGAppDelegate.m in Sources */,
+				CE45363E189975F60025ECA6 /* CAGTodoListViewController.m in Sources */,
 				CE45361A189975510025ECA6 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
