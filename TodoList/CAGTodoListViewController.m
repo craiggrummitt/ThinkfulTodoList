@@ -7,6 +7,7 @@
 //
 
 #import "CAGTodoListViewController.h"
+#import "Todo.h"
 
 @interface CAGTodoListViewController ()
 @property (strong, nonatomic) NSMutableArray *todos;
@@ -20,17 +21,25 @@
     if (self) {
         // Custom initialization
         self.navigationItem.title = @"To-Do List";
+       // self.navigationItem.title = [NSString stringWithFormat:@"To-Do List %f", CGRectGetWidth(self.view.frame)];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(didTapAddButton)];
-        //get todos from persisent data
-        self.todos = [[NSUserDefaults standardUserDefaults] objectForKey:@"todos"];
+        /********   get todos from file using custom model with NSCoding */
+        self.todos = [NSKeyedUnarchiver unarchiveObjectWithFile:self.resourcePath];
+        /********      get todos from persisent data using custom model with NSCoding
+        NSData *todoData =[[NSUserDefaults standardUserDefaults] objectForKey:@"todos"];
+        self.todos = [NSKeyedUnarchiver unarchiveObjectWithData:todoData];*/
+        /********      get todos from persisent data using NSDictionary
+        //        self.todos = [[NSUserDefaults standardUserDefaults] objectForKey:@"todos"];*/
         if (!self.todos) {
             self.todos = [[NSMutableArray alloc] init];
         }
-        [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
+        //[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
     }
     return self;
 }
-
+- (NSString *)resourcePath {
+    return [NSBundle.mainBundle.resourcePath  stringByAppendingPathComponent:@"todos"];
+}
 - (void) didTapAddButton
 {
     CAGCreateTodoViewController *createVC = [[CAGCreateTodoViewController alloc] init];
@@ -47,9 +56,70 @@
     alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     [alertView show];*/
 }
+//user selects a row, edits a todo
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    Todo *todo = self.todos[indexPath.row];
+    CAGCreateTodoViewController *createVC = [[CAGCreateTodoViewController alloc] initWithTodo:todo atRow:indexPath.row];
+    //UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:createVC];
+    createVC.delegate = self;
+    [self.navigationController pushViewController:createVC animated:YES];
+    
+}
+//user hits 'Done' button in 'editTodo' popup
+- (void)updateTodo: (NSString *)todo withDueDate:(NSDate *)dueDate atRow:(NSUInteger)row;
+{
+    /* EDIT USING CUSTOM MODEL */
+    Todo *item = [[Todo alloc] init];
+    item.text = todo;
+    item.dueDate = dueDate;
+    [self.todos replaceObjectAtIndex:row withObject:item];
+    //sort data
+    NSSortDescriptor *todoSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"dueDate" ascending:YES];
+    [self.todos sortUsingDescriptors:@[todoSortDescriptor]];
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSData *todoData = [NSKeyedArchiver archivedDataWithRootObject:self.todos];
+    [userDefaults setObject:todoData forKey:@"todos"];
+    [userDefaults synchronize];
+    
+    [self.tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+   
+}
 //user hits 'Done' button in 'createTodo' popup
 - (void)createTodo:(NSString *)todo withDueDate:(NSDate *)dueDate
 {
+    /* CREATE USING CUSTOM MODEL */
+    Todo *item = [[Todo alloc] init];
+    item.text = todo;
+    item.dueDate = dueDate;
+    [self.todos addObject:item];
+    //sort data
+    NSSortDescriptor *todoSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"dueDate" ascending:YES];
+    [self.todos sortUsingDescriptors:@[todoSortDescriptor]];
+    
+    /********  PERSISTENT DATA USING Custom Model and saving to file */
+    [NSKeyedArchiver archiveRootObject:self.todos toFile:self.resourcePath];
+    /********  PERSISTENT DATA USING Custom Model and NSUserDefaults
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSData *todoData = [NSKeyedArchiver archivedDataWithRootObject:self.todos];
+    [userDefaults setObject:todoData forKey:@"todos"];
+    [userDefaults synchronize];*/
+    
+    
+    /******** CREATE USING NSDICTIONARY
+    NSDictionary *todoItem = @{@"text": todo, @"dueDate": dueDate};
+    [self.todos addObject:todoItem];
+    
+    //add to persisent data
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:self.todos forKey:@"todos"];
+    [userDefaults synchronize];
+            */
+    //reload tableView
+    [self.tableView reloadData];
+    
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 //user hits 'Cancel' button in 'createTodo' popup
@@ -65,10 +135,12 @@
             //    [self.todos addObject:input];
     //add to array
     [self.todos addObject:[alertView textFieldAtIndex:0].text];
-    //add to persisent data
+    /***** add to persistent data in file */
+    [NSKeyedArchiver archiveRootObject:self.todos toFile:[self resourcePath]];
+    /*****  add to persisent data in NSUserDefaults
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:self.todos forKey:@"todos"];
-    [userDefaults synchronize];
+    [userDefaults synchronize];*/
     
     //reload tableView
     [self.tableView reloadData];
@@ -112,9 +184,20 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+       // cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
-    cell.textLabel.text = self.todos[indexPath.row];
+    //get the two properties of the row(todoItem) and put them into the two textFields
+    Todo *todoItem = self.todos[indexPath.row];
+    cell.textLabel.text = todoItem.text;
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Due %@", [dateFormatter stringFromDate:todoItem.dueDate]];
+    
+    
+    //previous code - when we only had one property per row(todoItem)
+    //cell.textLabel.text = self.todos[indexPath.row][@"text"];
     return cell;
 }
 /*
@@ -132,10 +215,13 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.todos removeObjectAtIndex:indexPath.row];
-        
+        /*****persistent data - remove from file */
+        [NSKeyedArchiver archiveRootObject:self.todos toFile:self.resourcePath];
+        /*****persistent data - remove from NSUserDefaults
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        [userDefaults setObject:self.todos forKey:@"todos"];
-        [userDefaults synchronize];
+        NSData *todoData = [NSKeyedArchiver archivedDataWithRootObject:self.todos];
+        [userDefaults setObject:todoData forKey:@"todos"];
+        [userDefaults synchronize];*/
         
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }   
