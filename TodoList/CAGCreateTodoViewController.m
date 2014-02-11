@@ -48,8 +48,13 @@
       //  self.appWidth=CGRectGetHeight(self.view.frame);
     //}
     //******* CG ADDED END ***/
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
     [self renderView];
 }
+
 - (void)renderView
 {
     NSLog (@"Rotating! %f",CGRectGetWidth(self.view.frame));
